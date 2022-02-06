@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import { coins } from "../static/coins";
@@ -6,10 +6,36 @@ import Coin from "./Coin";
 import BalanceChart from "./BalanceChart";
 
 const Portfolio = () => {
+  const [sanityToken, setSanityToekn] = useState([]);
+  useEffect(() => {
+    const getCoins = async () => {
+      try {
+        const coins = await fetch(
+          "https://5e5cfjc0.api.sanity.io/v1/data/query/production?query=*%5B_type%3D%3D'coins'%5D%7B%0A%20%20name%2C%0A%20%20usdPrice%2C%0A%20%20contractAddress%2C%0A%20%20symbol%2C%0A%20%20logo%0A%7D"
+        );
+        const tempSanityTokens = await coins.json();
+        console.log("coins", coins);
+        console.log("tempSanityTokens", tempSanityTokens);
+        setSanityToekn(tempSanityTokens.result);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    return getCoins();
+  }, []);
+
   return (
     <Wrapper>
       <Content>
-        <BalanceChart />
+        <Chart>
+          <div>
+            <Balance>
+              <BalanceTitle>Portfolio balance</BalanceTitle>
+              <BalanceValue>$ 4</BalanceValue>
+            </Balance>
+          </div>
+          <BalanceChart />
+        </Chart>
         <PortfolioTable>
           <TableItem>
             <Title>Your Assets</Title>
@@ -29,8 +55,8 @@ const Portfolio = () => {
             </TableItem>
             <Divider />
             <div>
-              {coins.map((coin) => (
-                <div>
+              {coins.map((coin, i) => (
+                <div key={i}>
                   <Coin coin={coin} />
 
                   <Divider />
@@ -56,6 +82,24 @@ const Content = styled.div`
   width: 100%;
   max-width: 1000px;
   padding: 2rem 1rem;
+`;
+
+const Chart = styled.div`
+  border: 1px solid #282b2f;
+  padding: 1rem 2rem;
+`;
+
+const Balance = styled.div``;
+
+const BalanceTitle = styled.div`
+  color: #8a919e;
+  font-size: 0.9rem;
+`;
+
+const BalanceValue = styled.div`
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0.5rem 0;
 `;
 
 const PortfolioTable = styled.div`
