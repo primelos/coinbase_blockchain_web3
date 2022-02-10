@@ -1,8 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
+import { FaWallet } from "react-icons/fa";
+import { client } from "../../lib/sanity";
+import imageUrlBuilder from "@sanity/image-url";
 
-const Transfer = () => {
+const Transfer = ({
+  sanityToken,
+  setAction,
+  thirdWebTokens,
+  walletAddress,
+}) => {
   const [amount, setAmount] = useState(0);
+  const [recipient, setRecipient] = useState("");
+
+  useEffect(() => {
+    console.log("Token", sanityToken);
+    // const url = sanityToken.logo
+    //   ? imageUrlBuilder(client).image(sanityToken.logo).url()
+    //   : "";
+
+    // imageUrlBuilder(client).image(sanityToken.logo).url();
+    // console.log("url", url);
+    console.log("test", imageUrlBuilder(client));
+  }, [sanityToken, thirdWebTokens]);
 
   return (
     <Wrapper>
@@ -23,8 +43,33 @@ const Transfer = () => {
       <TransferForm>
         <Row>
           <FieldName>To</FieldName>
+          <Icon>
+            <FaWallet />
+          </Icon>
+          <Recipient
+            placeholder="Address"
+            value={recipient}
+            onChange={(e) => setRecipient(e.target.value)}
+          />
+        </Row>
+        <Divider />
+        <Row>
+          <FieldName>Pay with</FieldName>
+          <CoinSelectList>
+            <Icon>
+              <img src="" alt="" />
+            </Icon>
+            <CoinName>Ethereum</CoinName>
+          </CoinSelectList>
         </Row>
       </TransferForm>
+      <Row>
+        <Continue>Continue</Continue>
+      </Row>
+      <Row>
+        <BalanceTitle>ETH Balance</BalanceTitle>
+        <Balance>1.2 ETH</Balance>
+      </Row>
     </Wrapper>
   );
 };
@@ -83,6 +128,8 @@ const Warning = styled.div`
 
 const Divider = styled.div`
   border-bottom: 1px solid #282b2f;
+  width: 90%;
+  margin: auto;
 `;
 
 const TransferForm = styled.div`
@@ -165,3 +212,7 @@ const Continue = styled.button`
     background-color: #4a80f6;
   }
 `;
+
+const BalanceTitle = styled.div``;
+
+const Balance = styled.div``;
