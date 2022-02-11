@@ -5,24 +5,52 @@ import { client } from "../../lib/sanity";
 import imageUrlBuilder from "@sanity/image-url";
 
 const Transfer = ({
-  sanityToken,
+  selectedToken,
   setAction,
   thirdWebTokens,
   walletAddress,
 }) => {
   const [amount, setAmount] = useState(0);
   const [recipient, setRecipient] = useState("");
+  const [imageUrl, setImageUrl] = useState(null);
+  const [activeThirdWebToken, setActiveThirdWebToken] = useState();
+  const [balance, setBalance] = useState("Fetching...");
 
   useEffect(() => {
-    console.log("Token", sanityToken);
-    // const url = sanityToken.logo
-    //   ? imageUrlBuilder(client).image(sanityToken.logo).url()
-    //   : "";
+    const activeToken = thirdWebTokens.find(
+      (token) => token.address === selectedToken.contractAddress
+    );
+    setActiveThirdWebToken(activeToken);
+  }, [thirdWebTokens]);
 
-    // imageUrlBuilder(client).image(sanityToken.logo).url();
-    // console.log("url", url);
-    console.log("test", imageUrlBuilder(client));
-  }, [sanityToken, thirdWebTokens]);
+  useEffect(() => {
+    const url = imageUrlBuilder(client).image(selectedToken.logo).url();
+    setImageUrl(url);
+  }, [selectedToken]);
+
+  useEffect(() => {
+    const getBalance = async () => {
+      const balance = await activeThirdWebToken.balanceOf(walletAddress);
+      setBalance(balance.displayValue);
+    };
+    if (activeThirdWebToken) {
+      getBalance();
+    }
+  }, [activeThirdWebToken]);
+
+  const sendCrypto = async (amount, recipient) => {
+    if (activeThirdWebToken && amount && recipient) {
+      const tx = await activeThirdWebToken.transfer(
+        recipient,
+        amount.toString().concat("000000000000000000")
+      );
+      console.log(tx);
+      console.log("tx", tx);
+      setAction("transferred");
+    } else {
+      console.error("missing data");
+    }
+  };
 
   return (
     <Wrapper>
@@ -55,20 +83,24 @@ const Transfer = ({
         <Divider />
         <Row>
           <FieldName>Pay with</FieldName>
-          <CoinSelectList>
+          <CoinSelectList onClick={() => setAction("select")}>
             <Icon>
-              <img src="" alt="" />
+              <img src={imageUrl} alt="" />
             </Icon>
-            <CoinName>Ethereum</CoinName>
+            <CoinName>{selectedToken.name}</CoinName>
           </CoinSelectList>
         </Row>
       </TransferForm>
       <Row>
-        <Continue>Continue</Continue>
+        <Continue onClick={() => sendCrypto(amount, recipient)}>
+          Continue
+        </Continue>
       </Row>
       <Row>
-        <BalanceTitle>ETH Balance</BalanceTitle>
-        <Balance>1.2 ETH</Balance>
+        <BalanceTitle>{selectedToken.symbol} Balance</BalanceTitle>
+        <Balance>
+          {balance} {selectedToken.symbol}
+        </Balance>
       </Row>
     </Wrapper>
   );
