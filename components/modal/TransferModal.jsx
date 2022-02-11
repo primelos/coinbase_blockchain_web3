@@ -1,10 +1,11 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import Transfer from "./Transfer";
+import CoinSelector from "./CoinSelector";
 
-const TransferModal = ({ sanityToken, thirdWebToken, walletAddress }) => {
+const TransferModal = ({ sanityToken, thirdWebTokens, walletAddress }) => {
   const [action, setAction] = useState("send");
-  const [selectedToken, setSelectedToken] = useState(sanityToken[0]);
+  const [selectedToken, setSelectedToken] = useState(sanityToken[2]);
   const selectedStyle = {
     color: "#3773f5",
   };
@@ -18,14 +19,25 @@ const TransferModal = ({ sanityToken, thirdWebToken, walletAddress }) => {
       case "send":
         return (
           <Transfer
-            sanityToken={sanityToken}
             setAction={setAction}
-            thirdWebToken={thirdWebToken}
+            selectedToken={selectedToken}
+            thirdWebTokens={thirdWebTokens}
             walletAddress={walletAddress}
           />
         );
       case "receive":
         return <h2>receive</h2>;
+      case "select":
+        return (
+          <CoinSelector
+            setAction={setAction}
+            selectedToken={selectedToken}
+            setSelectedToken={setSelectedToken}
+            sanityToken={sanityToken}
+            thirdWebTokens={thirdWebTokens}
+            walletAddress={walletAddress}
+          />
+        );
       default:
         return <h2>send</h2>;
     }
@@ -38,13 +50,13 @@ const TransferModal = ({ sanityToken, thirdWebToken, walletAddress }) => {
           style={action === "send" ? selectedStyle : unSelectedStyle}
           onClick={() => setAction("send")}
         >
-          <p>send</p>
+          <p>Send</p>
         </Option>
         <Option
           style={action === "receive" ? selectedStyle : unSelectedStyle}
           onClick={() => setAction("receive")}
         >
-          <p>receive</p>
+          <p>Receive</p>
         </Option>
       </Selector>
       <ModalMain>{selectedModal(action)}</ModalMain>
