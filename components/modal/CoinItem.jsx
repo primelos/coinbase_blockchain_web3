@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { getNativeTokenByChainId } from "@3rdweb/sdk";
+import imageUrlBuilder from "@sanity/image-url";
+import { client } from "../../lib/sanity";
+import { FaCheck } from "react-icons/fa";
 
 const CoinItem = ({
   token,
@@ -22,16 +24,43 @@ const CoinItem = ({
           activeThirdWebToken = thirdWebToken;
         }
       });
+      const balance = await activeThirdWebToken.balanceOf(sender);
+      return await setBalance(balance.displayValue.split(".")[0]);
     };
+    const getImgUrl = async () => {
+      const imgUrl = imageUrlBuilder(client).image(token.logo).url();
+      setImageUrl(imgUrl);
+    };
+    getImgUrl();
+    getBalance();
   }, []);
 
   return (
-    <Wrapper>
+    <Wrapper
+      style={{
+        backgroundColor: selectedToken.name === token.name && "#141519",
+      }}
+      onClick={() => {
+        setSelectedToken(token), setAction("send");
+      }}
+    >
       <Main>
         <Icon>
-          <img src="" alt="" />
+          <img src={imageUrl} alt="" />
         </Icon>
+        <NameDetails>
+          <Name>{token.name}</Name>
+          <Symbol>{token.symbol}</Symbol>
+        </NameDetails>
       </Main>
+      <Balance>
+        {balance} {token.symbol}
+      </Balance>
+      <IsSelected>
+        {!!(selectedToken.contractAddress === token.contractAddress) && (
+          <FaCheck />
+        )}
+      </IsSelected>
     </Wrapper>
   );
 };
@@ -80,7 +109,12 @@ const Name = styled.div`
 
 const Balance = styled.div``;
 
-const isSelected = styled.div`
+const IsSelected = styled.div`
   margin-left: 0.5rem;
   color: #3773f5;
+`;
+
+const Symbol = styled.div`
+  color: #888f9b;
+  font-size: 0.8rem;
 `;
