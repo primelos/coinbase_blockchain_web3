@@ -40,12 +40,11 @@ const Transfer = ({
 
   const sendCrypto = async (amount, recipient) => {
     if (activeThirdWebToken && amount && recipient) {
+      setAction("transferring");
       const tx = await activeThirdWebToken.transfer(
         recipient,
         amount.toString().concat("000000000000000000")
       );
-      console.log(tx);
-      console.log("tx", tx);
       setAction("transferred");
     } else {
       console.error("missing data");
@@ -62,7 +61,7 @@ const Transfer = ({
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
           />
-          <span>ETH</span>
+          <span>{selectedToken.symbol}</span>
         </FlexInputContainer>
         <Warning style={{ color: amount && "#0a0b0d" }}>
           Amount is a required field
@@ -87,7 +86,7 @@ const Transfer = ({
             <Icon>
               <img src={imageUrl} alt="" />
             </Icon>
-            <CoinName>{selectedToken.name}</CoinName>
+            <CoinName>{selectedToken && selectedToken.name}</CoinName>
           </CoinSelectList>
         </Row>
       </TransferForm>
