@@ -34,15 +34,18 @@ const Header = ({
     <Wrapper>
       <Title>Assests</Title>
       <ButtonsContainer>
-        <WalletLink>
-          <WalletLinkTitle>Wallet Connected</WalletLinkTitle>
-          <WalletAddress>
-            {walletAddress.slice(0, 7)} ... {walletAddress.slice(35)}
-          </WalletAddress>
-        </WalletLink>
-        <Button style={{ backgroundColor: "#3773f5", color: "#000" }}>
-          Buy / Sell
-        </Button>
+        {walletAddress ? (
+          <WalletLink>
+            <WalletLinkTitle>Wallet Connected</WalletLinkTitle>
+            <WalletAddress>
+              {walletAddress.slice(0, 7)} ... {walletAddress.slice(35)}
+            </WalletAddress>
+          </WalletLink>
+        ) : (
+          <Button style={{ backgroundColor: "#3773f5", color: "#000" }}>
+            Buy / Sell
+          </Button>
+        )}
         <Link href={"/?transfer=1"}>
           <Button>Send / Receive</Button>
         </Link>
